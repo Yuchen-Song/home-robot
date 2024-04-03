@@ -154,11 +154,11 @@ class FMMPlanner:
                 cv2.imshow("Planner Distance", dist_vis)
                 cv2.waitKey(1)
 
-            if self.print_images and timestep is not None:
-                cv2.imwrite(
-                    os.path.join(self.vis_dir, f"planner_snapshot_{timestep}.png"),
-                    (dist_vis * 255).astype(int),
-                )
+            # if self.print_images and timestep is not None:
+            #     cv2.imwrite(
+            #         os.path.join(self.vis_dir, f"planner_snapshot_{timestep}.png"),
+            #         (dist_vis * 255).astype(int),
+            #     )
         return dd
 
     def get_short_term_goal(
@@ -203,12 +203,12 @@ class FMMPlanner:
         subset *= mask
         subset += (1 - mask) * self.fmm_dist.shape[0] ** 2
 
-        visualize = True
-        if visualize:
-            plt.subplot(232)
-            plt.imshow(subset)
-            plt.subplot(235)
-            plt.imshow(mask)
+        # visualize = True
+        # if visualize:
+        #     plt.subplot(232)
+        #     plt.imshow(subset)
+        #     plt.subplot(235)
+        #     plt.imshow(mask)
 
         if self.debug:
             print(
@@ -221,10 +221,10 @@ class FMMPlanner:
         ratio1 = subset / dist_mask
         subset[ratio1 < -1.5] = 1
 
-        if visualize:
-            plt.subplot(233)
-            plt.imshow(subset)
-            plt.show()
+        # if visualize:
+        #     plt.subplot(233)
+        #     plt.imshow(subset)
+        #     plt.show()
 
         (stg_x, stg_y) = np.unravel_index(np.argmin(subset), subset.shape)
 

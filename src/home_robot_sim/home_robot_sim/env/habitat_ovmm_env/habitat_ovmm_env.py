@@ -112,6 +112,11 @@ class HabitatOpenVocabManipEnv(HabitatEnv):
         episode_id = self.get_current_episode().episode_id
         self.visualizer.set_vis_dir(scene_id=scene_id, episode_id=episode_id)
 
+    def set_obs_dir(self):
+        scene_id = self.get_current_episode().scene_id.split("/")[-1].split(".")[0]
+        episode_id = self.get_current_episode().episode_id
+        self.visualizer.set_obs_dir(scene_id=scene_id, episode_id=episode_id)
+
     def reset(self):
         habitat_obs = self.habitat_env.reset()
         self._last_habitat_obs = habitat_obs
@@ -119,6 +124,7 @@ class HabitatOpenVocabManipEnv(HabitatEnv):
         if self.visualize:
             self.visualizer.reset()
             self.set_vis_dir()
+            self.set_obs_dir()
         return self._last_obs
 
     def convert_pose_to_real_world_axis(self, hab_pose):
@@ -341,11 +347,17 @@ class HabitatOpenVocabManipEnv(HabitatEnv):
         if info and self.visualize:
             self.visualizer.visualize(**info)
 
+    def save_obs(self, obs: home_robot.core.interfaces.Observations, timestep):
+        self.visualizer.save_obs(obs, timestep)
+        pass
+
     def apply_action(
         self,
         action: home_robot.core.interfaces.Action,
         info: Optional[Dict[str, Any]] = None,
+        obs: Optional[home_robot.core.interfaces.Observations] = None,
     ):
+        self.save_obs(obs, info["timestep"])
         if info is not None:
             if type(action) == ContinuousNavigationAction:
                 info["curr_action"] = str([round(a, 3) for a in action.xyt])

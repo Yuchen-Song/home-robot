@@ -62,6 +62,7 @@ class Visualizer:
         self.show_images = config.VISUALIZE
         self.print_images = config.PRINT_IMAGES
         self.default_vis_dir = f"{config.DUMP_LOCATION}/images/{config.EXP_NAME}"
+        self.default_obs_dir = f"{config.DUMP_LOCATION}/obs/{config.EXP_NAME}"
         self._dataset = dataset
         os.makedirs(self.default_vis_dir, exist_ok=True)
         if hasattr(config, "habitat"):  # hydra configs
@@ -119,7 +120,7 @@ class Visualizer:
                 self.semantic_category_mapping = RearrangeDETICCategories(
                     self.obj_rec_combined_mapping
                 )
-
+        self.obs_dir = None
         self.vis_dir = None
         self.image_vis = None
         self.visited_map_vis = None
@@ -161,6 +162,12 @@ class Visualizer:
         self.vis_dir = os.path.join(self.default_vis_dir, f"{scene_id}_{episode_id}")
         shutil.rmtree(self.vis_dir, ignore_errors=True)
         os.makedirs(self.vis_dir, exist_ok=True)
+
+    def set_obs_dir(self, scene_id: str, episode_id: str):
+        self.print_images = True
+        self.obs_dir = os.path.join(self.default_obs_dir, f"{scene_id}_{episode_id}")
+        shutil.rmtree(self.obs_dir, ignore_errors=True)
+        os.makedirs(self.obs_dir, exist_ok=True)
 
     def disable_print_images(self):
         self.print_images = False
@@ -238,6 +245,14 @@ class Visualizer:
             )
             # update semantic map with instance ids
             semantic_map[border_pixels > 0] = PI.INSTANCE_BORDER
+
+    def save_obs(self, obs, timestep):
+        save_dir = os.path.join(self.obs_dir, "obs_{:03d}.npy".format(timestep))
+        # save_list = ['gps', 'compass', 'rgb', 'depth', 'camera_pose', 'camera_K']
+        # save_dict = {'gps': obs.gps, 'compass': obs.compass, 'rgb': obs.rgb, 'depth': obs.depth,
+        #              'camera_pose': obs.camera_pose}
+        np.save(save_dir, obs)
+        pass
 
     def visualize(
         self,
